@@ -39,7 +39,7 @@ To achieve all user comfort, Orion comes with an in-built powerful media player 
 
 ## Install Orion on Linux Desktop
 
-**Using snap**
+**Using snap (Recommended)**
 
 <a href="https://snapcraft.io/orion-desktop">
   <img  width='240'  alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" />

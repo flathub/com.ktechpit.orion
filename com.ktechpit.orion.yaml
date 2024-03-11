@@ -186,7 +186,8 @@ modules:
     sources:
       - type: file
         # curl -H 'Snap-Device-Series: 16' https://api.snapcraft.io/v2/snaps/info/orion-desktop | jq '."channel-map"' | jq '.[]' | jq '[."download"."url"]' | grep -m1 https | tr -d ' ' | tr -d '"'
-        url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_69.snap
+        url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_70.snap
         only-arches:
           - x86_64
-        sha256: 162506669d6db370198581cbecf781628adf269038a16b8fc651cd4b2c3068e3
+        # curl -Ls https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_70.snap | sha256sum		
+        sha256: 1531ce27e55262fb0544779fe3221aa2fdbc1a1dc8a9731bda0936dc162fd841
