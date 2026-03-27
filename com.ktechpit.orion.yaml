@@ -29,31 +29,7 @@ cleanup:
   - /lib/pkgconfig
 
 modules:
-  - name: lzo
-    config-opts:
-      - --enable-shared
-      - --disable-static
-    cleanup:
-      - /include
-      - /share/doc
-      - '*.la'
-      - /lib/*.so
-    sources:
-      - type: git
-        url: https://github.com/nemequ/lzo.git
-        commit: 0083878c235a89ef96a009d1ff0b500f3a364e4b
-
-  - name: squashfs-tools
-    buildsystem: simple
-    build-commands:
-      - XZ_SUPPORT=1 LZO_SUPPORT=1 make -C squashfs-tools -j ${FLATPAK_BUILDER_N_JOBS} install INSTALL_DIR=${FLATPAK_DEST}/bin
-    cleanup:
-      - '*'
-    sources:
-    - type: git
-      url: https://github.com/plougher/squashfs-tools.git
-      tag: '4.5'
-      commit: '0496d7c3de3e09da37ba492081c86159806ebb07'
+  - shared-modules/squashfs-tools/squashfs-tools.json
 
   - name: x264
     config-opts:
@@ -185,9 +161,7 @@ modules:
 
     sources:
       - type: file
-        # curl -H 'Snap-Device-Series: 16' https://api.snapcraft.io/v2/snaps/info/orion-desktop | jq '."channel-map"' | jq '.[]' | jq '[."download"."url"]' | grep -m1 https | tr -d ' ' | tr -d '"'
         url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_70.snap
         only-arches:
           - x86_64
-        # curl -Ls https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_70.snap | sha256sum		
         sha256: 1531ce27e55262fb0544779fe3221aa2fdbc1a1dc8a9731bda0936dc162fd841
