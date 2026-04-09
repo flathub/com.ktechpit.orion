@@ -101,12 +101,15 @@ modules:
   - name: orion
     buildsystem: simple
     build-commands:
-      - unsquashfs -no-progress *.snap
-      - cp -r squashfs-root/usr/share/icons ${FLATPAK_DEST}/share/
-      - cp -r squashfs-root/usr/bin/ ${FLATPAK_DEST}/usr/bin/
-      - install -Dm644 squashfs-root/usr/share/applications/com.ktechpit.orion.desktop ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
-      - desktop-file-edit --set-icon=${FLATPAK_ID} ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
-      - install -Dm644 squashfs-root/usr/share/metainfo/com.ktechpit.orion.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.ktechpit.orion.metainfo.xml
+        - unsquashfs -no-progress *.snap
+        - cp -r squashfs-root/usr/share/icons ${FLATPAK_DEST}/share/
+
+        - install -d ${FLATPAK_DEST}/bin
+        - cp -r squashfs-root/usr/bin/* ${FLATPAK_DEST}/bin/
+
+        - install -Dm644 squashfs-root/usr/share/applications/com.ktechpit.orion.desktop ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
+        - desktop-file-edit --set-icon=${FLATPAK_ID} ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
+        - install -Dm644 squashfs-root/usr/share/metainfo/com.ktechpit.orion.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.ktechpit.orion.metainfo.xml
 
     sources:
         # =========================
