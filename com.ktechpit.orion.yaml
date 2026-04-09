@@ -1,20 +1,14 @@
 app-id: com.ktechpit.orion
-base: io.qt.qtwebkit.BaseApp
-base-version: '5.15-22.08'
+base: io.qt.qtwebengine.BaseApp
+base-version: '6.10'
 runtime: org.kde.Platform
-runtime-version: 5.15-22.08
+runtime-version: '6.10'
 sdk: org.kde.Sdk
-sdk-extensions:
-  - org.freedesktop.Sdk.Extension.node14
 command: orion
 finish-args:
   - --device=all
   - --env=INSTALL_TYPE=flatpak
-  - --filesystem=/tmp
-  - --filesystem=xdg-download
-  - --filesystem=xdg-pictures
   - --filesystem=xdg-run/gvfsd
-  - --filesystem=xdg-videos
   - --share=ipc
   - --share=network
   - --socket=fallback-x11
@@ -23,80 +17,31 @@ finish-args:
   - --talk-name=org.freedesktop.FileManager1
   - --own-name=org.mpris.MediaPlayer2.mpv.*
   - --talk-name=org.gnome.SessionManager
+  - --system-talk-name=org.freedesktop.UPower.*
+
+  # download directories for convenience
+  - --filesystem=xdg-desktop
+  - --filesystem=xdg-download
+  - --filesystem=xdg-music
+  - --filesystem=xdg-pictures
+  - --filesystem=xdg-videos
+
 
 cleanup:
   - /include
+  - /lib/cmake
+  - /share/man
+  - /share/doc
   - /lib/pkgconfig
 
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
+
 modules:
-  - name: lzo
-    config-opts:
-      - --enable-shared
-      - --disable-static
-    cleanup:
-      - /include
-      - /share/doc
-      - '*.la'
-      - /lib/*.so
-    sources:
-      - type: git
-        url: https://github.com/nemequ/lzo.git
-        commit: 0083878c235a89ef96a009d1ff0b500f3a364e4b
-
-  - name: squashfs-tools
-    buildsystem: simple
-    build-commands:
-      - XZ_SUPPORT=1 LZO_SUPPORT=1 make -C squashfs-tools -j ${FLATPAK_BUILDER_N_JOBS} install INSTALL_DIR=${FLATPAK_DEST}/bin
-    cleanup:
-      - '*'
-    sources:
-    - type: git
-      url: https://github.com/plougher/squashfs-tools.git
-      tag: '4.5'
-      commit: '0496d7c3de3e09da37ba492081c86159806ebb07'
-
-  - name: x264
-    config-opts:
-      - '--disable-cli'
-      - '--enable-shared'
-    sources:
-      - type: git
-        url: https://code.videolan.org/videolan/x264.git
-        commit: 5db6aa6cab1b146e07b60cc1736a01f21da01154
-
-  - name: x265
-    buildsystem: cmake-ninja
-    builddir: true
-    subdir: source
-    config-opts:
-      - '-DCMAKE_BUILD_TYPE=Release'
-      - '-DENABLE_CLI=OFF'
-    sources:
-      - type: archive
-        url: https://deb.debian.org/debian/pool/main/x/x265/x265_3.5.orig.tar.gz
-        sha256: e70a3335cacacbba0b3a20ec6fecd6783932288ebc8163ad74bcc9606477cae8
-
-
-  - name: libass
-    sources:
-      - type: archive
-        url: https://github.com/libass/libass/releases/download/0.16.0/libass-0.16.0.tar.xz
-        sha256: 5dbde9e22339119cf8eed59eea6c623a0746ef5a90b689e68a090109078e3c08
-      - type: script
-        commands:
-          - autoreconf -fiv
-        dest-filename: autogen.sh
-    cleanup:
-      - /include
-      - /lib/pkgconfig
-      - /share
-      - '*.a'
-      - '*.la'
+  - shared-modules/squashfs-tools/squashfs-tools.json
 
   - name: luajit
     no-autogen: true
-    make-install-args:
-      - PREFIX=${FLATPAK_DEST}
     cleanup:
       - /bin
       - /include
@@ -105,89 +50,84 @@ modules:
     sources:
       - type: git
         url: https://github.com/LuaJIT/LuaJIT.git
-        #branch: v2.1
-        commit: 4c2441c16ce3c4e312aaefecc6d40c4fe21de97c
+        disable-shallow-clone: true
+        commit: 659a61693aa3b87661864ad0f12eee14c865cd7f
+      - type: shell
+        commands:
+          - sed -i 's|/usr/local|/app|' ./Makefile
 
-  - name: ffmpeg
+  - name: libass
     config-opts:
-      - '--disable-debug'
-      - '--disable-doc'
-      - '--enable-rpath'
-      - '--enable-gpl'
-      - '--disable-static'
-      - '--enable-shared'
-      - '--enable-libfontconfig'
-      - '--enable-libfreetype'
-      - '--enable-libopus'
-      - '--enable-libpulse'
-      - '--enable-librsvg'
-      - '--enable-libvpx'
-      - '--enable-libdav1d'
-      - '--enable-libxml2'
-      - '--enable-libx264'
-      - '--enable-libx265'
-      - '--enable-libv4l2'
-      - '--enable-libmp3lame'
-      - '--enable-libass'
-      - '--enable-gnutls'
-      - '--enable-libvorbis'
-      - '--enable-libaom'
-      - '--enable-libopenjpeg'
-    cleanup:
-      - /share/ffmpeg/examples
+      - --disable-static
     sources:
       - type: archive
-        url: https://www.ffmpeg.org/releases/ffmpeg-4.4.1.tar.xz
-        sha256: eadbad9e9ab30b25f5520fbfde99fae4a92a1ae3c0257a8d68569a4651e30e02
+        url: https://github.com/libass/libass/releases/download/0.17.4/libass-0.17.4.tar.xz
+        sha256: 78f1179b838d025e9c26e8fef33f8092f65611444ffa1bfc0cfac6a33511a05a
+
+  - name: libplacebo
+    buildsystem: meson
+    config-opts:
+      - -Dvulkan=disabled
+      - -Dshaderc=disabled
+    sources:
+      - type: git
+        url: https://github.com/haasn/libplacebo.git
+        tag: v7.360.1
+        commit: cee9b076f2c63104ccfd497fa79c39a867293ec4
 
   - name: mpv
-    buildsystem: simple
-    build-commands:
-      - python3 waf configure --disable-alsa --disable-build-date --disable-manpage-build
-        --prefix=/app
-      - python3 waf build
-      - python3 waf install
+    buildsystem: meson
+    build-options:
+      cflags: -DNDEBUG=1
+    config-opts:
+      - -Dlibmpv=true
+      - -Dbuild-date=false
+      - -Dpulse=enabled
+      - -Dalsa=enabled
+      - -Dmanpage-build=disabled
+      - -Dcdda=disabled
+      - -Ddvbin=disabled
+      - -Ddvdnav=disabled
+      - -Djavascript=disabled
+      - -Dlibarchive=disabled
+      - -Dlua=enabled
+      - -Dshaderc=disabled
+      - -Dvulkan=disabled
     sources:
       - type: archive
-        url: https://github.com/mpv-player/mpv/archive/v0.34.1.tar.gz
-        sha256: 32ded8c13b6398310fa27767378193dc1db6d78b006b70dbcbd3123a1445e746
-      - type: file
-        url: https://waf.io/waf-2.0.24
-        sha256: 93909bca823a675f9f40af7c65b24887c3a3c0efdf411ff1978ba827194bdeb0
-        dest-filename: waf
-    post-install:
-      - mkdir -p /app/etc/mpv/
-      - echo "screenshot-directory=~/Pictures/Orion-screenshots" > /app/etc/mpv/mpv.conf
-    cleanup:
-      - /include
-      - /lib/pkgconfig
-      - /share
+        url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.41.0.tar.gz
+        sha256: ee21092a5ee427353392360929dc64645c54479aefdb5babc5cfbb5fad626209
 
-  - name: socat
-    sources:
-      - type: archive
-        url: http://www.dest-unreach.org/socat/download/socat-1.7.4.4.tar.gz
-        sha256: 0f8f4b9d5c60b8c53d17b60d79ababc4a0f51b3bb6d2bd3ae8a6a4b9d68f195e
-                            
   - name: orion
     buildsystem: simple
     build-commands:
-      - unsquashfs -no-progress mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y*.snap
-      - install -Dm755 squashfs-root/usr/bin/orion ${FLATPAK_DEST}/bin/orion
-      - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/
-      - cp -R squashfs-root/usr/share/icons/hicolor/* ${FLATPAK_DEST}/share/icons/hicolor/
-      - install -Dm644 squashfs-root/usr/share/applications/com.ktechpit.orion.desktop ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
-      - install -Dm644 squashfs-root/usr/share/metainfo/com.ktechpit.orion.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.ktechpit.orion.metainfo.xml
-      - install -Dm755 squashfs-root/bin/node ${FLATPAK_DEST}/bin/node
-      - cp -axR squashfs-root/lib/node_modules/ ${FLATPAK_DEST}/lib/node_modules/
-      - ln -sf ${FLATPAK_DEST}/lib/node_modules/orion/node_modules ${FLATPAK_DEST}/bin/node_modules
-      - ln -sf ${FLATPAK_DEST}/lib/node_modules/orion/src ${FLATPAK_DEST}/bin/src
+        - unsquashfs -no-progress *.snap
+        - cp -r squashfs-root/usr/share/icons ${FLATPAK_DEST}/share/
+
+        - install -d ${FLATPAK_DEST}/bin
+        - cp -r squashfs-root/usr/bin/* ${FLATPAK_DEST}/bin/
+
+        - install -Dm644 squashfs-root/usr/share/applications/com.ktechpit.orion.desktop ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
+        - desktop-file-edit --set-icon=${FLATPAK_ID} ${FLATPAK_DEST}/share/applications/com.ktechpit.orion.desktop
+        - install -Dm644 squashfs-root/usr/share/metainfo/com.ktechpit.orion.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.ktechpit.orion.metainfo.xml
 
     sources:
-      - type: file
-        # curl -H 'Snap-Device-Series: 16' https://api.snapcraft.io/v2/snaps/info/orion-desktop | jq '."channel-map"' | jq '.[]' | jq '[."download"."url"]' | grep -m1 https | tr -d ' ' | tr -d '"'
-        url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_70.snap
-        only-arches:
-          - x86_64
-        # curl -Ls https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_70.snap | sha256sum		
-        sha256: 1531ce27e55262fb0544779fe3221aa2fdbc1a1dc8a9731bda0936dc162fd841
+        # =========================
+        # x86_64 – stable
+        # =========================
+        - type: file
+          url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_95.snap
+          sha256: 7aa39bc7bd6be1fddc52c3da38331da01ac0716cf33ba06f7f5940a5bdd1d931
+          only-arches:
+            - x86_64
+
+
+
+        # =========================
+        # aarch64 – stable
+        # =========================
+        - type: file
+          url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_96.snap
+          sha256: 1b87d1525cd9acbd2e455527832e77f908edc115818713773c87666a1c4548b2
+          only-arches:
+            - aarch64
