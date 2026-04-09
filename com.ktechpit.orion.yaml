@@ -8,7 +8,6 @@ command: orion
 finish-args:
   - --device=all
   - --env=INSTALL_TYPE=flatpak
-  - --filesystem=/tmp
   - --filesystem=xdg-run/gvfsd
   - --share=ipc
   - --share=network
