@@ -8,23 +8,22 @@ command: orion
 finish-args:
   - --device=all
   - --env=INSTALL_TYPE=flatpak
-  - --filesystem=xdg-run/gvfsd
   - --share=ipc
   - --share=network
   - --socket=fallback-x11
   - --socket=pulseaudio
   - --socket=wayland
   - --talk-name=org.freedesktop.FileManager1
-  - --own-name=org.mpris.MediaPlayer2.mpv.*
-  - --talk-name=org.gnome.SessionManager
   - --system-talk-name=org.freedesktop.UPower.*
 
   # download directories for convenience
-  - --filesystem=xdg-desktop
   - --filesystem=xdg-download
-  - --filesystem=xdg-music
   - --filesystem=xdg-pictures
   - --filesystem=xdg-videos
+
+  #  mpris support via dbus
+  - --own-name=org.mpris.MediaPlayer2.mpv.*
+  - --talk-name=org.gnome.SessionManager
 
 
 cleanup:
@@ -116,8 +115,8 @@ modules:
         # x86_64 – stable
         # =========================
         - type: file
-          url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_95.snap
-          sha256: 7aa39bc7bd6be1fddc52c3da38331da01ac0716cf33ba06f7f5940a5bdd1d931
+          url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_98.snap
+          sha256: 32f7e5e1deb6fe08177028cfb6571ad9ac2021021c71dc841f1b093a89769b1b
           only-arches:
             - x86_64
 
@@ -127,7 +126,8 @@ modules:
         # aarch64 – stable
         # =========================
         - type: file
-          url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_96.snap
-          sha256: 1b87d1525cd9acbd2e455527832e77f908edc115818713773c87666a1c4548b2
+          url: https://api.snapcraft.io/api/v1/snaps/download/mxJjEy7qHbIIUwLKrkjqbuLDSG1GcR5Y_97.snap
+          sha256: 19f1e7cb7ef5e7448e8fe6fd03511c704968fc869f2c41b45d6d8c75168c417c
           only-arches:
             - aarch64
+
