@@ -25,9 +25,6 @@ finish-args:
   - --own-name=org.mpris.MediaPlayer2.mpv.*
   - --talk-name=org.gnome.SessionManager
 
-  # desktop notifications using D-Bus
-  - --talk-name=org.freedesktop.Notifications
-
 cleanup:
   - /include
   - /lib/cmake
