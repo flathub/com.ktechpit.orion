@@ -23,6 +23,8 @@ cleanup:
   - /share/man
   - /share/doc
   - /lib/pkgconfig
+  - '*.la'
+  - '*.a'
 
 cleanup-commands:
   - /app/cleanup-BaseApp.sh
@@ -34,9 +36,6 @@ modules:
     no-autogen: true
     cleanup:
       - /bin
-      - /include
-      - /lib/pkgconfig
-      - /share/man
     sources:
       - type: git
         url: https://github.com/LuaJIT/LuaJIT.git
@@ -83,6 +82,9 @@ modules:
       - -Dlua=enabled
       - -Dshaderc=disabled
       - -Dvulkan=disabled
+    cleanup:
+      - /share/bash-completion
+      - /share/fish
     sources:
       - type: archive
         url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.41.0.tar.gz
